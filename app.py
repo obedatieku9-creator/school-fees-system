@@ -88,6 +88,28 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
+@app.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password != confirm_password:
+            flash('New passwords do not match')
+            return redirect(url_for('change_password'))
+
+        if not User.authenticate(current_user.id, current_password):
+            flash('Current password is incorrect')
+            return redirect(url_for('change_password'))
+
+        User.set_password(current_user.id, new_password)
+        flash('Password updated successfully')
+        return redirect(url_for('dashboard'))
+
+    return render_template('change_password.html')
+
 @app.route('/students')
 @login_required
 def students():
@@ -236,13 +258,13 @@ def receipt(receipt_number):
     db = Database()
     conn = db.get_connection()
     cursor = conn.cursor()
-    cursor.execute('''
+    cursor.execute(db.convert_query('''
         SELECT p.*, s.full_name, s.student_id, c.name as class_name
         FROM payments p
         JOIN students s ON p.student_id = s.student_id
         JOIN classes c ON s.class_id = c.id
         WHERE p.receipt_number = ?
-    ''', (receipt_number,))
+    '''), (receipt_number,))
     payment = cursor.fetchone()
     conn.close()
 

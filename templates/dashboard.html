@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - School Fees Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-users"></i> Total Students</h5>
+                <h2>{{ stats.total_students }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-money-bill-wave"></i> Fees Collected</h5>
+                <h2>GHS {{ "%.2f"|format(stats.total_collected) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Outstanding</h5>
+                <h2>GHS {{ "%.2f"|format(stats.outstanding) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-calendar-day"></i> Today's Payments</h5>
+                <h2>{{ stats.payments_today }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('add_student') }}" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Add Student
+                    </a>
+                    <a href="{{ url_for('add_payment') }}" class="btn btn-success">
+                        <i class="fas fa-credit-card"></i> Record Payment
+                    </a>
+                    <a href="{{ url_for('reports') }}" class="btn btn-info">
+                        <i class="fas fa-chart-bar"></i> View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Recent payments and activities will appear here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

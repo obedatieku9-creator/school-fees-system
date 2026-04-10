@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt - School Fees Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card" id="receipt">
+            <div class="card-header bg-primary text-white text-center">
+                <h4><i class="fas fa-receipt"></i> Payment Receipt</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h3>StarHACS School</h3>
+                    <p>School Fees Management System</p>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <strong>Receipt Number:</strong><br>
+                        {{ get_item(payment, 'receipt_number') }}
+                    </div>
+                    <div class="col-6 text-end">
+                        <strong>Date:</strong><br>
+                        {{ get_item(payment, 'payment_date') }}
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <strong>Student Information:</strong>
+                    <div class="ms-3">
+                        <p><strong>Name:</strong> {{ get_item(payment, 'full_name') }}</p>
+                        <p><strong>Student ID:</strong> {{ get_item(payment, 'student_id') }}</p>
+                        <p><strong>Class:</strong> {{ get_item(payment, 'class_name') }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <strong>Payment Details:</strong>
+                    <div class="ms-3">
+                        <p><strong>Amount Paid:</strong> GHS {{ "%.2f"|format(get_item(payment, 'amount')) }}</p>
+                        <p><strong>Term:</strong> {{ get_item(payment, 'term') }}</p>
+                        <p><strong>Payment Method:</strong> {{ get_item(payment, 'payment_method') }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <strong>Balance Information:</strong>
+                    <div class="ms-3">
+                        {% for term, bal in balance.items() %}
+                        <p><strong>{{ term }}:</strong> GHS {{ "%.2f"|format(bal) }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="text-center">
+                    <p><em>Thank you for your payment!</em></p>
+                    <p class="text-muted">This is a computer-generated receipt.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Receipt
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #receipt, #receipt * {
+        visibility: visible;
+    }
+    #receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .btn {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

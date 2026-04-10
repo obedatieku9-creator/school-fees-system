@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: school-fees-system
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        value: replace-with-a-strong-secret

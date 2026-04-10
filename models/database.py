@@ -14,11 +14,115 @@ class Database:
         if self.db_path != default_db and not os.path.exists(self.db_path):
             if os.path.exists(default_db):
                 shutil.copyfile(default_db, self.db_path)
+        self.ensure_database()
 
     def get_connection(self):
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
+
+    def has_table(self, table_name):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,))
+        exists = cursor.fetchone() is not None
+        conn.close()
+        return exists
+
+    def initialize_database(self):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role TEXT DEFAULT 'admin'
+            )
+        ''')
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS classes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL,
+                section TEXT NOT NULL
+            )
+        ''')
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS students (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id TEXT UNIQUE NOT NULL,
+                full_name TEXT NOT NULL,
+                gender TEXT NOT NULL,
+                date_of_birth TEXT NOT NULL,
+                class_id INTEGER NOT NULL,
+                parent_name TEXT NOT NULL,
+                parent_phone TEXT NOT NULL,
+                address TEXT NOT NULL,
+                FOREIGN KEY (class_id) REFERENCES classes (id)
+            )
+        ''')
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS fees_structure (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                class_id INTEGER NOT NULL,
+                term TEXT NOT NULL,
+                amount REAL NOT NULL,
+                FOREIGN KEY (class_id) REFERENCES classes (id),
+                UNIQUE(class_id, term)
+            )
+        ''')
+
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS payments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id TEXT NOT NULL,
+                amount REAL NOT NULL,
+                term TEXT NOT NULL,
+                payment_date TEXT NOT NULL,
+                payment_method TEXT NOT NULL,
+                receipt_number TEXT UNIQUE NOT NULL,
+                FOREIGN KEY (student_id) REFERENCES students (student_id)
+            )
+        ''')
+
+        cursor.execute('''
+            INSERT OR IGNORE INTO users (username, password_hash, role)
+            VALUES (?, ?, ?)
+        ''', ('admin', generate_password_hash('admin123'), 'admin'))
+
+        classes = [
+            ('Foundation 1', 'Pre-School'),
+            ('Foundation 2', 'Pre-School'),
+            ('Reception 1', 'Pre-School'),
+            ('Reception 2', 'Pre-School'),
+            ('Primary 1', 'Primary School'),
+            ('Primary 2', 'Primary School'),
+            ('Primary 3', 'Primary School'),
+            ('Primary 4', 'Primary School'),
+            ('Primary 5', 'Primary School'),
+            ('Primary 6', 'Primary School'),
+            ('JHS 1', 'JHS'),
+            ('JHS 2', 'JHS'),
+            ('JHS 3', 'JHS')
+        ]
+
+        for name, section in classes:
+            cursor.execute('INSERT OR IGNORE INTO classes (name, section) VALUES (?, ?)', (name, section))
+
+        conn.commit()
+        conn.close()
+
+    def ensure_database(self):
+        if not os.path.exists(self.db_path):
+            self.initialize_database()
+            return
+
+        if not self.has_table('users'):
+            self.initialize_database()
 
     def init_admin(self):
         conn = self.get_connection()

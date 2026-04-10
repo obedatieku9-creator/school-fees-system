@@ -11,4 +11,4 @@ COPY . ./
 
 EXPOSE 8080
 
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "wsgi:app", "--workers", "1"]
+CMD gunicorn --bind 0.0.0.0:$PORT wsgi:app --workers 1

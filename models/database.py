@@ -806,7 +806,7 @@ class Report:
                 GROUP BY s.class_id, p.term
             ) p ON c.id = p.class_id AND fs.term = p.term
             GROUP BY c.id, c.name
-            HAVING outstanding > 0
+            HAVING SUM(fs.amount - COALESCE(p.total_paid, 0)) > 0
             ORDER BY outstanding DESC
         ''')
         data = cursor.fetchall()

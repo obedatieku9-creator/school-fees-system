@@ -271,11 +271,11 @@ def receipt(receipt_number):
         JOIN classes c ON s.class_id = c.id
         WHERE p.receipt_number = ?
     '''), (receipt_number,))
-    payment = cursor.fetchone()
+    payment = db._wrap_one(cursor, cursor.fetchone())
     conn.close()
 
     if payment:
-        balance = Payment.get_student_balance(payment[1])  # student_id
+        balance = Payment.get_student_balance(payment['student_id'])
         return render_template('receipt.html', payment=payment, balance=balance)
     return 'Receipt not found', 404
 

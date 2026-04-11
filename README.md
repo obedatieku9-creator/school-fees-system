@@ -37,6 +37,24 @@ A comprehensive school fees management system built with Python Flask, SQLite, a
 
 - `SECRET_KEY`: Set this to a strong random value in production.
 - `FLASK_ENV`: Set to `production` when deploying.
+- `DATABASE_URL`: Optional PostgreSQL connection string. If set, the app uses PostgreSQL instead of local SQLite.
+
+## PostgreSQL Migration
+
+If you already have data in the local SQLite database at `database/school_fees.db`, use the migration helper to copy it into PostgreSQL:
+
+```powershell
+python migrate_sqlite_to_postgres.py --postgres "postgres://user:password@host:port/dbname"
+```
+
+Or, if `DATABASE_URL` is already set in your environment:
+
+```powershell
+$env:DATABASE_URL="postgres://user:password@host:port/dbname"
+python migrate_sqlite_to_postgres.py
+```
+
+After migration, start the app with `DATABASE_URL` set so it uses PostgreSQL.
 
 ## Running the Application
 
@@ -64,6 +82,7 @@ school_fees_system/
 │   ├── init_db.py        # Database initialization
 │   ├── sample_data.py    # Sample data insertion
 │   └── school_fees.db    # SQLite database (created automatically)
+├── migrate_sqlite_to_postgres.py  # Optional SQLite-to-Postgres migration helper
 ├── models/
 │   └── database.py       # Database models and operations
 ├── static/
@@ -135,6 +154,7 @@ This project can be deployed to a free Python hosting service.
 6. Add environment variables:
    - `SECRET_KEY` = a strong random string
    - `FLASK_ENV` = `production`
+   - `DATABASE_URL` = your Postgres connection string (optional, for persistent storage)
 
 ### Option 2: PythonAnywhere (free tier)
 1. Sign up at https://www.pythonanywhere.com.

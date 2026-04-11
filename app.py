@@ -37,6 +37,12 @@ app = Flask(__name__)
 env = os.environ.get('FLASK_ENV', 'development').lower()
 app.config.from_object(DevelopmentConfig if env == 'development' else ProductionConfig)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+
+if os.environ.get('DATABASE_URL'):
+    app.logger.info('Using PostgreSQL via DATABASE_URL')
+else:
+    app.logger.info('DATABASE_URL not set; using local SQLite database')
+
 csrf = CSRFProtect(app)
 app.csrf = csrf
 

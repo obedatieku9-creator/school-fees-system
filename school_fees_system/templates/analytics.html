@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - School Fees Management{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h2><i class="fas fa-chart-line"></i> Analytics Dashboard</h2>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Fee Collection Trends (Last 12 Months)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="collectionChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Payment Methods Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="paymentMethodsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Class-wise Fee Performance</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="classPerformanceChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Outstanding Fees by Class</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="outstandingFeesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Monthly Payment Patterns</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="monthlyPatternsChart" width="800" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fee Collection Trends
+    const collectionCtx = document.getElementById('collectionChart').getContext('2d');
+    new Chart(collectionCtx, {
+        type: 'line',
+        data: {
+            labels: {{ collection_trends.labels | tojson }},
+            datasets: [{
+                label: 'Fees Collected (GHS)',
+                data: {{ collection_trends.data | tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Payment Methods Distribution
+    const paymentMethodsCtx = document.getElementById('paymentMethodsChart').getContext('2d');
+    new Chart(paymentMethodsCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ payment_methods.labels | tojson }},
+            datasets: [{
+                data: {{ payment_methods.data | tojson }},
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Class-wise Fee Performance
+    const classPerformanceCtx = document.getElementById('classPerformanceChart').getContext('2d');
+    new Chart(classPerformanceCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ class_performance.labels | tojson }},
+            datasets: [{
+                label: 'Collected (GHS)',
+                data: {{ class_performance.collected | tojson }},
+                backgroundColor: 'rgb(75, 192, 192)'
+            }, {
+                label: 'Outstanding (GHS)',
+                data: {{ class_performance.outstanding | tojson }},
+                backgroundColor: 'rgb(255, 99, 132)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Outstanding Fees by Class
+    const outstandingFeesCtx = document.getElementById('outstandingFeesChart').getContext('2d');
+    new Chart(outstandingFeesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ outstanding_fees.labels | tojson }},
+            datasets: [{
+                data: {{ outstanding_fees.data | tojson }},
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)',
+                    'rgb(255, 159, 64)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // Monthly Payment Patterns
+    const monthlyPatternsCtx = document.getElementById('monthlyPatternsChart').getContext('2d');
+    new Chart(monthlyPatternsCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_patterns.labels | tojson }},
+            datasets: [{
+                label: 'Number of Payments',
+                data: {{ monthly_patterns.data | tojson }},
+                backgroundColor: 'rgb(54, 162, 235)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
